@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppointFlow</string>
+    <string name="tagline">Cabinet Médical &amp; Rendez-vous Facile</string>
+
+    <!-- Splash Screen -->
+    <string name="loading">Chargement…</string>
+
+    <!-- Login/Signup -->
+    <string name="welcome">Bienvenue sur AppointFlow</string>
+    <string name="login_title">Connexion</string>
+    <string name="signup_title">Créer un compte</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe</string>
+    <string name="confirm_password">Confirmer le mot de passe</string>
+    <string name="firstname">Prénom</string>
+    <string name="lastname">Nom</string>
+    <string name="phone">Téléphone</string>
+    <string name="birthdate">Date de naissance</string>
+    <string name="remember_me">Se souvenir de moi</string>
+    <string name="forgot_password">Mot de passe oublié ?</string>
+    <string name="login_button">Se connecter</string>
+    <string name="signup_button">S\'inscrire</string>
+    <string name="no_account">Pas encore de compte ?</string>
+    <string name="have_account">Déjà un compte ?</string>
+    <string name="signup_link">Créer un compte</string>
+    <string name="login_link">Se connecter</string>
+    <string name="or_continue_with">Ou continuer avec</string>
+    <string name="google_signin">Google</string>
+
+    <!-- Password Requirements -->
+    <string name="password_requirements">Le mot de passe doit contenir :</string>
+    <string name="password_min_length">• Minimum 8 caractères</string>
+    <string name="password_uppercase">• Une lettre majuscule</string>
+    <string name="password_number">• Un chiffre</string>
+    <string name="password_special">• Un caractère spécial</string>
+
+    <!-- Patient Dashboard -->
+    <string name="dashboard_title">Accueil</string>
+    <string name="hello">Bonjour</string>
+    <string name="next_appointments">Prochains rendez-vous</string>
+    <string name="no_appointments">Aucun rendez-vous à venir</string>
+    <string name="book_appointment">Prendre rendez-vous</string>
+    <string name="my_appointments">Mes rendez-vous</string>
+    <string name="find_doctor">Trouver un médecin</string>
+    <string name="profile">Mon profil</string>
+
+    <!-- Appointments -->
+    <string name="appointment_with">Rendez-vous avec</string>
+    <string name="appointment_date">Date</string>
+    <string name="appointment_time">Heure</string>
+    <string name="appointment_reason">Motif</string>
+    <string name="appointment_status">Statut</string>
+    <string name="cancel_appointment">Annuler</string>
+    <string name="modify_appointment">Modifier</string>
+    <string name="confirm_appointment">Confirmer</string>
+
+    <!-- Status -->
+    <string name="status_confirmed">Confirmé</string>
+    <string name="status_pending">En attente</string>
+    <string name="status_cancelled">Annulé</string>
+    <string name="status_completed">Réalisé</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_appointments">Rendez-vous</string>
+    <string name="nav_doctors">Médecins</string>
+    <string name="nav_profile">Profil</string>
+
+    <!-- Common -->
+    <string name="search">Rechercher</string>
+    <string name="filter">Filtrer</string>
+    <string name="save">Enregistrer</string>
+    <string name="cancel">Annuler</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+    <string name="close">Fermer</string>
+    <string name="ok">OK</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+</resources>
