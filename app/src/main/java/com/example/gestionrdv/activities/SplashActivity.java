@@ -1,0 +1,4 @@
+package com.example.gestionrdv.activities;
+
+public class SplashActivity {
+}
