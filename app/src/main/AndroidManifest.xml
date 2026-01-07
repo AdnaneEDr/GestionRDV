@@ -14,25 +14,17 @@
         android:theme="@style/Theme.GestionRDV"
         tools:targetApi="31">
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name=".activities.LoginActivity"
+            android:exported="false"
+            tools:ignore="MissingClass" />
+        <activity
+            android:name=".activities.SignupActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.admin.AdminDashboardActivity"
+            android:name=".activities.ForgotPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.doctor.DoctorDashboardActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.patient.BookAppointmentActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.patient.PatientHomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".activities.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
