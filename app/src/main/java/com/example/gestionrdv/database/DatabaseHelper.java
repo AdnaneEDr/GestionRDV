@@ -17,7 +17,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
     private static DatabaseHelper instance;
 
-    // Singleton pattern to prevent multiple database instances
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (instance == null) {
             instance = new DatabaseHelper(context.getApplicationContext());
@@ -37,7 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(UserEntry.CREATE_TABLE);
         db.execSQL(PatientEntry.CREATE_TABLE);
         db.execSQL(DoctorEntry.CREATE_TABLE);
-        db.execSQL(AdminEntry.CREATE_TABLE); // Ensure AdminEntry exists in DatabaseContract
+        db.execSQL(AdminEntry.CREATE_TABLE);
         db.execSQL(AppointmentEntry.CREATE_TABLE);
         db.execSQL(TimeSlotEntry.CREATE_TABLE);
 
