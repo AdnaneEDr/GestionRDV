@@ -7,7 +7,7 @@ public class User {
     private long id;
     private String email;
     private String password;
-    private String userType; // "patient", "doctor", "admin"
+    private String userType;
     private String createdAt;
 
     public User() {}
