@@ -35,8 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         forgotPasswordLink = findViewById(R.id.forgotPasswordLink);
 
         btnLogin.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, PatientDashboardActivity.class);
-            startActivity(intent);
+            performLogin();
         });
 
         signupLink.setOnClickListener(v -> {

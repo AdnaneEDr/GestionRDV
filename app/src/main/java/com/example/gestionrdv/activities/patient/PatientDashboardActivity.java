@@ -128,27 +128,8 @@ public class PatientDashboardActivity extends AppCompatActivity {
             Toast.makeText(this, "Notifications", Toast.LENGTH_SHORT).show();
         });
 
-        // Quick action cards in GridLayout
-        setupQuickActionCards();
     }
 
-    private void setupQuickActionCards() {
-        // Find Doctor Card (first card in grid)
-        View findDoctorCard = ((android.widget.GridLayout) findViewById(R.id.bottomNavigation).getRootView()
-                .findViewById(android.R.id.content))
-                .findViewById(R.id.bottomNavigation);
-
-        // We need to find cards differently - let's use the parent layout approach
-        View contentView = findViewById(android.R.id.content);
-        if (contentView != null) {
-            // Find the GridLayout and its children
-            android.widget.GridLayout gridLayout = null;
-            View rootView = getWindow().getDecorView().getRootView();
-
-            // Alternative: Set click listeners on card views by iterating
-            // For now, let's use a simpler approach with tag or content description
-        }
-    }
 
     private void setupBottomNavigation() {
         bottomNavigation.setSelectedItemId(R.id.nav_home);
