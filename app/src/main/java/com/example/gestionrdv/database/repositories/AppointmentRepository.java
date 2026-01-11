@@ -356,4 +356,92 @@ public class AppointmentRepository {
 
         return appointment;
     }
+    // MÉTHODES À AJOUTER À AppointmentRepository.java
+
+    /**
+     * Get all appointments (for admin)
+     */
+    public List<Appointment> getAllAppointments() {
+        List<Appointment> appointments = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT a.*, " +
+                "p." + PatientEntry.COLUMN_FIRST_NAME + " || ' ' || p." + PatientEntry.COLUMN_LAST_NAME + " as patient_name, " +
+                "d." + DoctorEntry.COLUMN_FIRST_NAME + " || ' ' || d." + DoctorEntry.COLUMN_LAST_NAME + " as doctor_name, " +
+                "d." + DoctorEntry.COLUMN_SPECIALIZATION + " as doctor_specialization " +
+                "FROM " + AppointmentEntry.TABLE_NAME + " a " +
+                "INNER JOIN " + PatientEntry.TABLE_NAME + " p ON a." + AppointmentEntry.COLUMN_PATIENT_ID + " = p." + PatientEntry._ID + " " +
+                "INNER JOIN " + DoctorEntry.TABLE_NAME + " d ON a." + AppointmentEntry.COLUMN_DOCTOR_ID + " = d." + DoctorEntry._ID + " " +
+                "ORDER BY a." + AppointmentEntry.COLUMN_APPOINTMENT_DATE + " DESC, a." + AppointmentEntry.COLUMN_APPOINTMENT_TIME + " DESC";
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                appointments.add(cursorToAppointment(cursor));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return appointments;
+    }
+
+    /**
+     * Get appointments by date (for admin calendar)
+     */
+    public List<Appointment> getAppointmentsByDate(String date) {
+        List<Appointment> appointments = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT a.*, " +
+                "p." + PatientEntry.COLUMN_FIRST_NAME + " || ' ' || p." + PatientEntry.COLUMN_LAST_NAME + " as patient_name, " +
+                "d." + DoctorEntry.COLUMN_FIRST_NAME + " || ' ' || d." + DoctorEntry.COLUMN_LAST_NAME + " as doctor_name, " +
+                "d." + DoctorEntry.COLUMN_SPECIALIZATION + " as doctor_specialization " +
+                "FROM " + AppointmentEntry.TABLE_NAME + " a " +
+                "INNER JOIN " + PatientEntry.TABLE_NAME + " p ON a." + AppointmentEntry.COLUMN_PATIENT_ID + " = p." + PatientEntry._ID + " " +
+                "INNER JOIN " + DoctorEntry.TABLE_NAME + " d ON a." + AppointmentEntry.COLUMN_DOCTOR_ID + " = d." + DoctorEntry._ID + " " +
+                "WHERE a." + AppointmentEntry.COLUMN_APPOINTMENT_DATE + " = ? " +
+                "ORDER BY a." + AppointmentEntry.COLUMN_APPOINTMENT_TIME + " ASC";
+
+        Cursor cursor = db.rawQuery(query, new String[]{date});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                appointments.add(cursorToAppointment(cursor));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return appointments;
+    }
+
+    /**
+     * Get appointments by date and status (for admin calendar filtering)
+     */
+    public List<Appointment> getAppointmentsByDateAndStatus(String date, String status) {
+        List<Appointment> appointments = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT a.*, " +
+                "p." + PatientEntry.COLUMN_FIRST_NAME + " || ' ' || p." + PatientEntry.COLUMN_LAST_NAME + " as patient_name, " +
+                "d." + DoctorEntry.COLUMN_FIRST_NAME + " || ' ' || d." + DoctorEntry.COLUMN_LAST_NAME + " as doctor_name, " +
+                "d." + DoctorEntry.COLUMN_SPECIALIZATION + " as doctor_specialization " +
+                "FROM " + AppointmentEntry.TABLE_NAME + " a " +
+                "INNER JOIN " + PatientEntry.TABLE_NAME + " p ON a." + AppointmentEntry.COLUMN_PATIENT_ID + " = p." + PatientEntry._ID + " " +
+                "INNER JOIN " + DoctorEntry.TABLE_NAME + " d ON a." + AppointmentEntry.COLUMN_DOCTOR_ID + " = d." + DoctorEntry._ID + " " +
+                "WHERE a." + AppointmentEntry.COLUMN_APPOINTMENT_DATE + " = ? " +
+                "AND a." + AppointmentEntry.COLUMN_STATUS + " = ? " +
+                "ORDER BY a." + AppointmentEntry.COLUMN_APPOINTMENT_TIME + " ASC";
+
+        Cursor cursor = db.rawQuery(query, new String[]{date, status});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                appointments.add(cursorToAppointment(cursor));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return appointments;
+    }
 }

@@ -168,6 +168,91 @@ public class AdminRepository {
     }
 
     /**
+     * Verify admin password
+     * @param adminId Admin ID
+     * @param password Password to verify
+     * @return true if password is correct
+     */
+    public boolean verifyAdminPassword(int adminId, String password) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Get user_id from admins table
+            String query = "SELECT user_id FROM admins WHERE id = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(adminId)});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int userId = cursor.getInt(0);
+                cursor.close();
+
+                // Verify password in users table
+                String passwordQuery = "SELECT id FROM users WHERE id = ? AND password = ?";
+                cursor = db.rawQuery(passwordQuery, new String[]{String.valueOf(userId), password});
+
+                return cursor != null && cursor.moveToFirst();
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error verifying admin password", e);
+            return false;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
+     * Update admin password
+     * @param adminId Admin ID
+     * @param newPassword New password
+     * @return true if password was updated successfully
+     */
+    public boolean updateAdminPassword(int adminId, String newPassword) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Get user_id from admins table
+            String query = "SELECT user_id FROM admins WHERE id = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(adminId)});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int userId = cursor.getInt(0);
+                cursor.close();
+
+                // Update password in users table
+                ContentValues values = new ContentValues();
+                values.put("password", newPassword);
+
+                int rowsAffected = db.update("users", values, "id = ?",
+                        new String[]{String.valueOf(userId)});
+
+                if (rowsAffected > 0) {
+                    Log.d(TAG, "Password updated successfully for admin ID: " + adminId);
+                    return true;
+                } else {
+                    Log.e(TAG, "Failed to update password for admin ID: " + adminId);
+                    return false;
+                }
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating admin password", e);
+            return false;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
      * Helper method to convert cursor to Admin object
      */
     private Admin cursorToAdmin(Cursor cursor) {
