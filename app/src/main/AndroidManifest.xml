@@ -32,6 +32,57 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Patient Activities -->
+        <activity
+            android:name=".activities.patient.PatientDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.patient.PatientProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.patient.PatientFileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.patient.BookAppointmentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.patient.SelectDateTimeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.patient.AppointmentDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.patient.AppointmentsListActivity"
+            android:exported="false" />
+
+        <!-- Doctor Activities -->
+        <activity
+            android:name=".activities.doctor.DoctorDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.doctor.DoctorSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.doctor.DoctorScheduleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.doctor.DoctorAppointmentsActivity"
+            android:exported="false" />
+
+        <!-- Admin Activities -->
+        <activity
+            android:name=".activities.admin.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.admin.AdminCalendarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.admin.AdminDoctorsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.admin.AdminSettingsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
