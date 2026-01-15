@@ -75,6 +75,9 @@
             android:name=".activities.admin.AdminDashboardActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.admin.AdminPatientsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.admin.AdminCalendarActivity"
             android:exported="false" />
         <activity
@@ -83,6 +86,13 @@
         <activity
             android:name=".activities.admin.AdminSettingsActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.InitDatabaseActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activities.admin.AdminAppointmentsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GestionRDV" />
     </application>
 
 </manifest>

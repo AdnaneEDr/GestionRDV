@@ -301,6 +301,33 @@ public class DoctorRepository {
     }
 
     /**
+     * Get count of active doctors (all doctors)
+     * @return Number of doctors
+     */
+    public int getActiveDoctorsCount() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
+        int count = 0;
+
+        try {
+            String query = "SELECT COUNT(*) FROM " + DoctorEntry.TABLE_NAME;
+            cursor = db.rawQuery(query, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting doctors count", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return count;
+    }
+
+    /**
      * Helper method to convert cursor to Doctor object
      */
     private Doctor cursorToDoctor(Cursor cursor) {
