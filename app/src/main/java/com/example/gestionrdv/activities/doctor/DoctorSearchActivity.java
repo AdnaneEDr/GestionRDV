@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -12,7 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gestionrdv.R;
+import com.example.gestionrdv.activities.patient.BookAppointmentActivity;
 import com.example.gestionrdv.adapters.DoctorAdapter;
+import com.example.gestionrdv.database.repositories.DoctorRepository;
 import com.example.gestionrdv.models.Doctor;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
@@ -24,6 +27,8 @@ import java.util.List;
 
 public class DoctorSearchActivity extends AppCompatActivity {
 
+    private static final String TAG = "DoctorSearchActivity";
+
     private MaterialToolbar toolbar;
     private TextInputEditText searchInput;
     private ChipGroup filterChipGroup;
@@ -31,23 +36,28 @@ public class DoctorSearchActivity extends AppCompatActivity {
     private LinearLayout emptyStateLayout;
 
     private DoctorAdapter adapter;
+    private DoctorRepository doctorRepository;
     private List<Doctor> allDoctors;
     private List<Doctor> filteredDoctors;
 
     private boolean isSelectionMode = false;
+    private String currentFilter = "Toutes spécialités";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_search);
 
+        // Initialize repository
+        doctorRepository = new DoctorRepository(this);
+
         isSelectionMode = getIntent().getBooleanExtra("selection_mode", false);
 
         initViews();
-        setupSampleData();
+        loadDoctorsFromDatabase();
+        setupFilterChips();
         setupRecyclerView();
         setupSearch();
-        setupFilterChips();
         setupClickListeners();
     }
 
@@ -59,45 +69,93 @@ public class DoctorSearchActivity extends AppCompatActivity {
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
     }
 
-    private void setupSampleData() {
-        allDoctors = new ArrayList<>();
+    private void loadDoctorsFromDatabase() {
+        // Fetch all doctors from database
+        allDoctors = doctorRepository.getAllDoctors();
 
-        Doctor doc1 = new Doctor("Fatima", "Zahra", "Médecine générale");
-        doc1.setId(1);
-        doc1.setExperience(15);
-        doc1.setRating(4.8);
-        doc1.setLocation("Tanger");
-        allDoctors.add(doc1);
+        if (allDoctors == null) {
+            allDoctors = new ArrayList<>();
+        }
 
-        Doctor doc2 = new Doctor("Ahmed", "Bennani", "Cardiologie");
-        doc2.setId(2);
-        doc2.setExperience(20);
-        doc2.setRating(4.9);
-        doc2.setLocation("Casablanca");
-        allDoctors.add(doc2);
+        Log.d(TAG, "Loaded " + allDoctors.size() + " doctors from database");
 
-        Doctor doc3 = new Doctor("Sara", "El Amrani", "Dermatologie");
-        doc3.setId(3);
-        doc3.setExperience(10);
-        doc3.setRating(4.7);
-        doc3.setLocation("Rabat");
-        allDoctors.add(doc3);
-
-        Doctor doc4 = new Doctor("Karim", "Idrissi", "Pédiatrie");
-        doc4.setId(4);
-        doc4.setExperience(12);
-        doc4.setRating(4.6);
-        doc4.setLocation("Tanger");
-        allDoctors.add(doc4);
-
-        Doctor doc5 = new Doctor("Nadia", "Chakir", "Médecine générale");
-        doc5.setId(5);
-        doc5.setExperience(8);
-        doc5.setRating(4.5);
-        doc5.setLocation("Marrakech");
-        allDoctors.add(doc5);
-
+        // Initialize filtered list with all doctors
         filteredDoctors = new ArrayList<>(allDoctors);
+    }
+
+    private void setupFilterChips() {
+        // Clear existing dynamic chips (keep only the "All" chip)
+        Chip allChip = findViewById(R.id.chipAllSpecialties);
+
+        // Get unique specializations from database
+        List<String> specializations = doctorRepository.getAllSpecializations();
+
+        // Remove all chips except the first one (Toutes spécialités)
+        filterChipGroup.removeAllViews();
+
+        // Re-add the "All specialties" chip
+        Chip allSpecialtiesChip = createFilterChip("Toutes spécialités", true);
+        allSpecialtiesChip.setId(R.id.chipAllSpecialties);
+        filterChipGroup.addView(allSpecialtiesChip);
+
+        // Add chips for each specialization from database
+        if (specializations != null) {
+            for (String specialization : specializations) {
+                if (specialization != null && !specialization.isEmpty()) {
+                    Chip chip = createFilterChip(specialization, false);
+                    filterChipGroup.addView(chip);
+                }
+            }
+        }
+
+        // Set up listener for chip selection
+        filterChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) {
+                // If nothing selected, select "All" chip
+                allSpecialtiesChip.setChecked(true);
+                currentFilter = "Toutes spécialités";
+            } else {
+                // Get the selected chip's text
+                int checkedId = checkedIds.get(0);
+                Chip checkedChip = group.findViewById(checkedId);
+                if (checkedChip != null) {
+                    currentFilter = checkedChip.getText().toString();
+                }
+            }
+            filterDoctors();
+        });
+    }
+
+    private Chip createFilterChip(String text, boolean isChecked) {
+        Chip chip = new Chip(this);
+        chip.setText(text);
+        chip.setCheckable(true);
+        chip.setChecked(isChecked);
+        chip.setChipBackgroundColorResource(R.color.background_card);
+        chip.setChipStrokeColorResource(R.color.primary_medium);
+        chip.setChipStrokeWidth(1f);
+        chip.setTextColor(getResources().getColor(R.color.text_primary, null));
+        chip.setCheckedIconVisible(true);
+        chip.setCheckedIconTintResource(R.color.primary_medium);
+
+        // Style when checked
+        chip.setOnCheckedChangeListener((buttonView, checked) -> {
+            if (checked) {
+                chip.setChipBackgroundColorResource(R.color.primary_light);
+                chip.setTextColor(getResources().getColor(R.color.text_white, null));
+            } else {
+                chip.setChipBackgroundColorResource(R.color.background_card);
+                chip.setTextColor(getResources().getColor(R.color.text_primary, null));
+            }
+        });
+
+        // Apply initial style if checked
+        if (isChecked) {
+            chip.setChipBackgroundColorResource(R.color.primary_light);
+            chip.setTextColor(getResources().getColor(R.color.text_white, null));
+        }
+
+        return chip;
     }
 
     private void setupRecyclerView() {
@@ -113,8 +171,12 @@ public class DoctorSearchActivity extends AppCompatActivity {
                 setResult(RESULT_OK, resultIntent);
                 finish();
             } else {
-                // TODO: Open doctor profile/details
-                // For now, just show a toast or navigate to booking
+                // Navigate to book appointment with this doctor
+                Intent intent = new Intent(this, BookAppointmentActivity.class);
+                intent.putExtra("doctor_id", doctor.getId());
+                intent.putExtra("doctor_name", doctor.getFullName());
+                intent.putExtra("doctor_specialty", doctor.getSpecialization());
+                startActivity(intent);
             }
         });
 
@@ -137,41 +199,33 @@ public class DoctorSearchActivity extends AppCompatActivity {
         });
     }
 
-    private void setupFilterChips() {
-        filterChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            filterDoctors();
-        });
-    }
-
     private void filterDoctors() {
         String searchQuery = searchInput.getText() != null ?
                 searchInput.getText().toString().toLowerCase().trim() : "";
 
-        // Get selected filter
-        String selectedSpecialty = "Toutes spécialités";
-        int checkedChipId = filterChipGroup.getCheckedChipId();
-        if (checkedChipId != View.NO_ID) {
-            Chip checkedChip = findViewById(checkedChipId);
-            if (checkedChip != null) {
-                selectedSpecialty = checkedChip.getText().toString();
-            }
-        }
-
         filteredDoctors.clear();
 
         for (Doctor doctor : allDoctors) {
+            // Check search query match
             boolean matchesSearch = searchQuery.isEmpty() ||
                     doctor.getFullName().toLowerCase().contains(searchQuery) ||
-                    doctor.getSpecialization().toLowerCase().contains(searchQuery) ||
-                    doctor.getLocation().toLowerCase().contains(searchQuery);
+                    (doctor.getSpecialization() != null &&
+                     doctor.getSpecialization().toLowerCase().contains(searchQuery)) ||
+                    (doctor.getLocation() != null &&
+                     doctor.getLocation().toLowerCase().contains(searchQuery));
 
-            boolean matchesFilter = selectedSpecialty.equals("Toutes spécialités") ||
-                    doctor.getSpecialization().equalsIgnoreCase(selectedSpecialty);
+            // Check filter match
+            boolean matchesFilter = currentFilter.equals("Toutes spécialités") ||
+                    (doctor.getSpecialization() != null &&
+                     doctor.getSpecialization().equalsIgnoreCase(currentFilter));
 
             if (matchesSearch && matchesFilter) {
                 filteredDoctors.add(doctor);
             }
         }
+
+        Log.d(TAG, "Filtered to " + filteredDoctors.size() + " doctors (search: '" +
+              searchQuery + "', filter: '" + currentFilter + "')");
 
         adapter.updateDoctors(filteredDoctors);
         updateEmptyState();
@@ -194,5 +248,13 @@ public class DoctorSearchActivity extends AppCompatActivity {
             }
             finish();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload doctors in case data changed
+        loadDoctorsFromDatabase();
+        filterDoctors();
     }
 }

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.example.gestionrdv.database.DatabaseContract.UserEntry;
 import com.example.gestionrdv.database.DatabaseHelper;
 import com.example.gestionrdv.models.User;
+import com.example.gestionrdv.utils.PasswordUtils;
 
 /**
  * UserRepository - Handles all user-related database operations
@@ -29,9 +30,12 @@ public class UserRepository {
     public long registerUser(String email, String password, String userType) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        // Hash the password before storing
+        String hashedPassword = PasswordUtils.hashPassword(password);
+
         ContentValues values = new ContentValues();
         values.put(UserEntry.COLUMN_EMAIL, email);
-        values.put(UserEntry.COLUMN_PASSWORD, password); // Hash in production!
+        values.put(UserEntry.COLUMN_PASSWORD, hashedPassword);
         values.put(UserEntry.COLUMN_USER_TYPE, userType);
 
         long userId = db.insert(UserEntry.TABLE_NAME, null, values);
@@ -52,9 +56,9 @@ public class UserRepository {
     public User login(String email, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String selection = UserEntry.COLUMN_EMAIL + " = ? AND " +
-                UserEntry.COLUMN_PASSWORD + " = ?";
-        String[] selectionArgs = {email, password};
+        // First, get user by email only
+        String selection = UserEntry.COLUMN_EMAIL + " = ?";
+        String[] selectionArgs = {email};
 
         Cursor cursor = db.query(
                 UserEntry.TABLE_NAME,
@@ -66,16 +70,37 @@ public class UserRepository {
 
         User user = null;
         if (cursor != null && cursor.moveToFirst()) {
-            user = new User();
-            user.setId(cursor.getLong(cursor.getColumnIndexOrThrow(UserEntry._ID)));
-            user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(UserEntry.COLUMN_EMAIL)));
-            user.setUserType(cursor.getString(cursor.getColumnIndexOrThrow(UserEntry.COLUMN_USER_TYPE)));
-            user.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow(UserEntry.COLUMN_CREATED_AT)));
+            // Get the stored password hash
+            String storedPassword = cursor.getString(cursor.getColumnIndexOrThrow(UserEntry.COLUMN_PASSWORD));
 
-            Log.d(TAG, "Login successful for: " + email);
+            // Verify the password
+            boolean passwordValid;
+            if (PasswordUtils.isHashed(storedPassword)) {
+                // Password is hashed - verify using secure comparison
+                passwordValid = PasswordUtils.verifyPassword(password, storedPassword);
+            } else {
+                // Legacy plain-text password (for backward compatibility during migration)
+                // This should be removed after all passwords are migrated
+                passwordValid = password.equals(storedPassword);
+                if (passwordValid) {
+                    Log.w(TAG, "User has legacy plain-text password. Consider migrating to hashed password.");
+                }
+            }
+
+            if (passwordValid) {
+                user = new User();
+                user.setId(cursor.getLong(cursor.getColumnIndexOrThrow(UserEntry._ID)));
+                user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(UserEntry.COLUMN_EMAIL)));
+                user.setUserType(cursor.getString(cursor.getColumnIndexOrThrow(UserEntry.COLUMN_USER_TYPE)));
+                user.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow(UserEntry.COLUMN_CREATED_AT)));
+                Log.d(TAG, "Login successful for: " + email);
+            } else {
+                Log.d(TAG, "Login failed for: " + email + " - Invalid password");
+            }
+
             cursor.close();
         } else {
-            Log.d(TAG, "Login failed for: " + email);
+            Log.d(TAG, "Login failed for: " + email + " - User not found");
         }
 
         return user;
@@ -142,8 +167,11 @@ public class UserRepository {
     public boolean updatePassword(long userId, String newPassword) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        // Hash the new password before storing
+        String hashedPassword = PasswordUtils.hashPassword(newPassword);
+
         ContentValues values = new ContentValues();
-        values.put(UserEntry.COLUMN_PASSWORD, newPassword); // Hash in production!
+        values.put(UserEntry.COLUMN_PASSWORD, hashedPassword);
 
         String selection = UserEntry._ID + " = ?";
         String[] selectionArgs = {String.valueOf(userId)};
@@ -154,6 +182,10 @@ public class UserRepository {
                 selection,
                 selectionArgs
         );
+
+        if (rowsAffected > 0) {
+            Log.d(TAG, "Password updated successfully for user ID: " + userId);
+        }
 
         return rowsAffected > 0;
     }

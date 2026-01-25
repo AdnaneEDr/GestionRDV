@@ -8,6 +8,7 @@ import android.util.Log;
 
 // Import the Contract classes
 import com.example.gestionrdv.database.DatabaseContract.*;
+import com.example.gestionrdv.utils.PasswordUtils;
 
 /**
  * Database Helper - Manages database creation and version management
@@ -83,7 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // --- Sample Admin User ---
             ContentValues adminUser = new ContentValues();
             adminUser.put(UserEntry.COLUMN_EMAIL, "admin@hospital.ma");
-            adminUser.put(UserEntry.COLUMN_PASSWORD, "admin123"); // In production, hash this!
+            adminUser.put(UserEntry.COLUMN_PASSWORD, PasswordUtils.hashPassword("admin123"));
             adminUser.put(UserEntry.COLUMN_USER_TYPE, "admin");
             long adminUserId = db.insert(UserEntry.TABLE_NAME, null, adminUser);
 
@@ -98,7 +99,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // --- Sample Doctor 1 - Dr. Fatima Zahra ---
             ContentValues doctor1User = new ContentValues();
             doctor1User.put(UserEntry.COLUMN_EMAIL, "fatima.zahra@hospital.ma");
-            doctor1User.put(UserEntry.COLUMN_PASSWORD, "doctor123");
+            doctor1User.put(UserEntry.COLUMN_PASSWORD, PasswordUtils.hashPassword("doctor123"));
             doctor1User.put(UserEntry.COLUMN_USER_TYPE, "doctor");
             long doctorUserId1 = db.insert(UserEntry.TABLE_NAME, null, doctor1User);
 
@@ -118,7 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // --- Sample Doctor 2 - Dr. Ahmed Bennani ---
             ContentValues doctor2User = new ContentValues();
             doctor2User.put(UserEntry.COLUMN_EMAIL, "ahmed.bennani@hospital.ma");
-            doctor2User.put(UserEntry.COLUMN_PASSWORD, "doctor123");
+            doctor2User.put(UserEntry.COLUMN_PASSWORD, PasswordUtils.hashPassword("doctor123"));
             doctor2User.put(UserEntry.COLUMN_USER_TYPE, "doctor");
             long doctorUserId2 = db.insert(UserEntry.TABLE_NAME, null, doctor2User);
 
@@ -159,7 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // --- Sample Patient ---
             ContentValues patientUser = new ContentValues();
             patientUser.put(UserEntry.COLUMN_EMAIL, "mohammed.alami@email.com");
-            patientUser.put(UserEntry.COLUMN_PASSWORD, "patient123");
+            patientUser.put(UserEntry.COLUMN_PASSWORD, PasswordUtils.hashPassword("patient123"));
             patientUser.put(UserEntry.COLUMN_USER_TYPE, "patient");
             long patientUserId = db.insert(UserEntry.TABLE_NAME, null, patientUser);
 
