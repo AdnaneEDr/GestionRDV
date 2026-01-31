@@ -72,6 +72,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
                         android:textSize="16sp"
+                        android:textColor="@android:color/black"
                         android:padding="16dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -94,6 +95,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
                         android:textSize="16sp"
+                        android:textColor="@android:color/black"
                         android:padding="16dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -117,6 +119,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
                     android:textSize="16sp"
+                    android:textColor="@android:color/black"
                     android:padding="16dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -139,6 +142,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="phone"
                     android:textSize="16sp"
+                    android:textColor="@android:color/black"
                     android:padding="16dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -162,6 +166,7 @@
                     android:focusable="false"
                     android:clickable="true"
                     android:textSize="16sp"
+                    android:textColor="@android:color/black"
                     android:padding="16dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -185,6 +190,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
                     android:textSize="16sp"
+                    android:textColor="@android:color/black"
                     android:padding="16dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -279,6 +285,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
                     android:textSize="16sp"
+                    android:textColor="@android:color/black"
                     android:padding="16dp" />
 
             </com.google.android.material.textfield.TextInputLayout>

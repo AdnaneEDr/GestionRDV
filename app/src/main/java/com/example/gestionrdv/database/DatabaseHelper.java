@@ -6,17 +6,30 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+
 // Import the Contract classes
 import com.example.gestionrdv.database.DatabaseContract.*;
 import com.example.gestionrdv.utils.PasswordUtils;
 
 /**
  * Database Helper - Manages database creation and version management
+ * Supports pre-packaged database from assets folder
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelper";
     private static DatabaseHelper instance;
+    private static final String ASSETS_DB_PATH = "databases/" + DatabaseContract.DATABASE_NAME;
+
+    private final Context context;
+    private boolean createFromAssets = false;
 
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (instance == null) {
@@ -27,10 +40,137 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private DatabaseHelper(Context context) {
         super(context, DatabaseContract.DATABASE_NAME, null, DatabaseContract.DATABASE_VERSION);
+        this.context = context;
+
+        // Check if we should copy from assets (only on first install)
+        if (!databaseExists() && assetsDatabaseExists()) {
+            createFromAssets = true;
+            copyDatabaseFromAssets();
+        }
+    }
+
+    /**
+     * Check if the database file already exists
+     */
+    private boolean databaseExists() {
+        File dbFile = context.getDatabasePath(DatabaseContract.DATABASE_NAME);
+        return dbFile.exists();
+    }
+
+    /**
+     * Check if a pre-packaged database exists in assets
+     */
+    private boolean assetsDatabaseExists() {
+        try {
+            String[] files = context.getAssets().list("databases");
+            if (files != null) {
+                for (String file : files) {
+                    if (file.equals(DatabaseContract.DATABASE_NAME)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error checking assets database: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Copy the pre-packaged database from assets to the app's data directory
+     */
+    private void copyDatabaseFromAssets() {
+        Log.d(TAG, "Copying database from assets...");
+
+        try {
+            // Ensure the databases directory exists
+            File dbFile = context.getDatabasePath(DatabaseContract.DATABASE_NAME);
+            File dbDir = dbFile.getParentFile();
+            if (dbDir != null && !dbDir.exists()) {
+                dbDir.mkdirs();
+            }
+
+            // Copy from assets
+            InputStream input = context.getAssets().open(ASSETS_DB_PATH);
+            OutputStream output = new FileOutputStream(dbFile);
+
+            byte[] buffer = new byte[8192];
+            int length;
+            while ((length = input.read(buffer)) > 0) {
+                output.write(buffer, 0, length);
+            }
+
+            output.flush();
+            output.close();
+            input.close();
+
+            Log.d(TAG, "Database copied from assets successfully");
+
+        } catch (IOException e) {
+            Log.e(TAG, "Error copying database from assets: " + e.getMessage());
+            createFromAssets = false;
+        }
+    }
+
+    /**
+     * Export the current database to a specified file path
+     * Use this to create a database file that can be committed to Git
+     *
+     * @param destinationPath The full path where to save the database
+     * @return true if export was successful
+     */
+    public boolean exportDatabase(String destinationPath) {
+        try {
+            // Close any open connections
+            close();
+
+            File currentDB = context.getDatabasePath(DatabaseContract.DATABASE_NAME);
+            File destinationFile = new File(destinationPath);
+
+            // Ensure destination directory exists
+            File destDir = destinationFile.getParentFile();
+            if (destDir != null && !destDir.exists()) {
+                destDir.mkdirs();
+            }
+
+            if (currentDB.exists()) {
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(destinationFile).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                Log.d(TAG, "Database exported to: " + destinationPath);
+                return true;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error exporting database: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Export database to the Downloads folder for easy access
+     * @return The path where the database was exported, or null if failed
+     */
+    public String exportToDownloads() {
+        File downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(
+                android.os.Environment.DIRECTORY_DOWNLOADS);
+        String exportPath = new File(downloadsDir, DatabaseContract.DATABASE_NAME).getAbsolutePath();
+
+        if (exportDatabase(exportPath)) {
+            return exportPath;
+        }
+        return null;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // If database was copied from assets, skip creation
+        if (createFromAssets) {
+            Log.d(TAG, "Database loaded from assets, skipping onCreate");
+            return;
+        }
+
         Log.d(TAG, "Creating database tables...");
 
         // Create tables in order (respecting foreign key constraints)
