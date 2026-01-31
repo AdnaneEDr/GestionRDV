@@ -50,6 +50,7 @@
                     android:padding="16dp"
                     android:background="@android:color/transparent"
                     android:inputType="text"
+                    android:textColor="@android:color/black"
                     android:maxLines="1" />
 
             </androidx.cardview.widget.CardView>

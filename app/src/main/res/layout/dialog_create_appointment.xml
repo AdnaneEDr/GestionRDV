@@ -70,6 +70,7 @@
         android:drawableEnd="@android:drawable/ic_menu_my_calendar"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="16dp" />
 
     <!-- Time Selection -->
@@ -92,6 +93,7 @@
         android:drawableEnd="@android:drawable/ic_menu_recent_history"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="16dp" />
 
     <!-- Reason -->
@@ -113,6 +115,7 @@
         android:minHeight="48dp"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="16dp" />
 
     <!-- Notes (Optional) -->
@@ -134,6 +137,7 @@
         android:gravity="top"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="20dp" />
 
     <!-- Buttons -->
